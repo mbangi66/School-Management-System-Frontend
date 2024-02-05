@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { StudentService } from '../student.service';
 import { Student } from '../student.model';
 import { StudentListService } from '../student-list.service';
@@ -27,31 +27,35 @@ export class StudentTableComponent implements OnInit {
   displayedColumns: string[] = ['id','name', 'grade', 'age', 'subject', 'year','classNumber','type', 'actions'];
 
   constructor(
+    private cdr : ChangeDetectorRef,
     public dialog: MatDialog,
     private studentService: StudentService,
     private studentListService: StudentListService, 
     private filterService: FilterService) {}
 
-  ngOnInit(): void {
-    this.getStudents();
+    ngOnInit(): void {
+      this.filterService.typeFilter$.subscribe((type) => {
+        console.log('ngOnInit Type Filter Changed:', type);
+        this.selectedType = type;
+        this.fetchStudents();
+      });
     
-    this.filterService.typeFilter$.subscribe((type) => {
-      console.log('Type Filter Changed:', type);
-      this.fetchStudents();
-    });
+      this.filterService.yearFilter$.subscribe((year) => {
+        console.log('ngOnInit Year Filter Changed:', year);
+        this.selectedYear = year;
+        this.fetchStudents();
+      });
     
-    this.filterService.yearFilter$.subscribe((year) => {
-      console.log('Year Filter Changed:', year);
-      this.fetchStudents();
-    });
+      this.filterService.classFilter$.subscribe((classNumber) => {
+        console.log('ngOnInit Class Filter Changed:', classNumber);
+        this.selectedClass = classNumber;
+        this.fetchStudents();
+      });
     
-    this.filterService.classFilter$.subscribe((classNumber) => {
-      console.log('Class Filter Changed:', classNumber);
-      this.fetchStudents();
-    });
+      this.getStudents();
     
-    console.log('Paginator:', this.paginator);
-  }
+      console.log('ngOnInit Paginator:', this.paginator);
+    }    
 
   getStudents(): void {
     this.studentService.getStudents().subscribe((response) => {
@@ -98,18 +102,18 @@ export class StudentTableComponent implements OnInit {
     console.log('Filter Values in Fetch:', filterValues);
   
     this.studentService.getFilteredStudents(filterValues.type, filterValues.year, filterValues.classNumber).subscribe(
-      (response: Student[]) => {
+      (response: any) => {
         console.log('Response:', response);
-        this.dataSource.data = response;
-        this.dataSource.paginator = this.paginator;  // Set paginator if using it
+        this.dataSource.data = response.students;
+        console.log('Data Source:', this.dataSource.data);
+        this.dataSource.paginator = this.paginator;
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error('Error fetching students', error);
       }
-    );
+    );    
   }
-  
-  
 
   getFilterValues(): { type: string, year: number | null, classNumber: string | null } {
     const type: string = this.selectedType || 'Primary';

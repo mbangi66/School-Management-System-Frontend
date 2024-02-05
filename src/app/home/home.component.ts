@@ -88,8 +88,6 @@ export class HomeComponent implements OnInit {
   applyFilter(): void {
     const filterValues = this.getFilterValues();
   
-    // Convert classNumber to a number before updating the filter service
-  
     this.ngZone.run(() => {
       // Update the filter service with the new values
       this.filterService.updateTypeFilter(filterValues.type);
@@ -122,19 +120,13 @@ export class HomeComponent implements OnInit {
   }
   getFilterValues(): { type: string; year: number | null; classNumber: string | null } {
     const type: string = this.filterForm.get('type')?.value || 'Primary';
-    
-    // Ensure that the selected year is of type number or null
-    const year: number | null = this.filterForm.get('year')?.value !== null
-      ? +this.filterForm.get('year')?.value
-      : null;
+    const year: number | null = this.filterForm.get('year')?.value !== null ? +this.filterForm.get('year')?.value : null;
+    const classNumber: string | null = this.filterForm.get('classNumber')?.value || null;
   
-    // Ensure that the selected class is of type string or null
-    const classNumber: string | null = this.filterForm.get('classNumber')?.value !== null
-      ? String(this.filterForm.get('classNumber')?.value)
-      : null;
+    console.log('Filter Values in Get:', { type, year, classNumber });
   
     return { type, year, classNumber };
-  }
+  }  
   
 
   openStudentFormDialog(student?: Student): void {

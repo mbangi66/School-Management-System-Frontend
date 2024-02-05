@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { Student } from './student.model';
-import { catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -62,8 +62,15 @@ export class StudentService {
     const encodedYear = encodeURIComponent(selectedYear?.toString() || '');
     const encodedClass = encodeURIComponent(selectedClass || '');
   
-    const url = `${this.apiUrl}/filtered-students?filter=${selectedFilter}&year=${selectedYear}&classNumber=${selectedClass}`;
+    const url = `${this.apiUrl}/filtered-students?filter=${encodedFilter}&year=${encodedYear}&classNumber=${encodedClass}`;
     
-    return this.http.get<Student[]>(url);
+     return this.http.get<Student[]>(url)
+    .pipe(
+      tap((data) => console.log('API Response:', data)),
+      catchError((error) => {
+        console.error('Error fetching filtered students', error);
+        return throwError(error);
+      })
+    );
   }  
 }
