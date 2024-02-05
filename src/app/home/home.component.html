@@ -1,1 +1,39 @@
-<p>home works!</p>
+<div class="Filter">
+<form [formGroup]="filterForm">
+    <mat-form-field appearance="fill">
+        <mat-label>Type:</mat-label>
+        <mat-select formControlName="type">
+          <mat-option value="KG">KG</mat-option>
+          <mat-option value="Primary">Primary</mat-option>
+          <mat-option value="Secondary">Secondary</mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <mat-form-field appearance="fill">
+        <mat-label>Year:</mat-label>
+        <mat-select formControlName="year">
+          <mat-option *ngFor="let year of yearOptions" [value]="year">{{ year }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    
+    <mat-form-field appearance="fill">
+        <mat-label>Class:</mat-label>
+        <mat-select formControlName="classNumber">
+          <mat-option *ngFor="let classOption of classOptions || []" [value]="classOption">
+            {{ classOption }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+  </form>
+  
+  <button mat-raised-button color="primary" (click)="applyFilter()">Apply Filter</button>
+</div>        
+
+<div class="container">
+  
+  <app-student-table [students]="students" (onDeleteStudent)="deleteStudent($event)"></app-student-table>
+  <!-- <app-student-form [student]="selectedStudent" 
+                (onStudentSaved)="handleStudentSaved($event)" 
+                (studentListRefresh)="fetchStudents()">
+  </app-student-form> -->
+</div> 

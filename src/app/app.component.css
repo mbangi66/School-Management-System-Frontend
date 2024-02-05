@@ -1,0 +1,10 @@
+.mat-toolbar {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .spacer {
+    flex: 1 1 auto;
+  }
+.container{
+    padding-bottom: 50px;
+}

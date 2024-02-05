@@ -1,0 +1,58 @@
+<div class="form-container">
+  <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill">
+      <mat-label>Name:</mat-label>
+      <input matInput type="text" id="name" formControlName="name" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Grade:</mat-label>
+      <input matInput type="text" id="grade" formControlName="grade" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Age:</mat-label>
+      <input matInput type="number" id="age" formControlName="age" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Subject:</mat-label>
+      <input matInput type="text" id="subject" formControlName="subject" required>
+    </mat-form-field>
+
+    <form [formGroup]="filterForm">
+      <mat-form-field appearance="fill">
+          <mat-label>Type:</mat-label>
+          <mat-select formControlName="type">
+            <mat-option value="KG">KG</mat-option>
+            <mat-option value="Primary">Primary</mat-option>
+            <mat-option value="Secondary">Secondary</mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="fill">
+          <mat-label>Year:</mat-label>
+          <mat-select formControlName="year">
+            <mat-option *ngFor="let year of yearOptions" [value]="year">{{ year }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      
+      <mat-form-field appearance="fill">
+          <mat-label>Class:</mat-label>
+          <mat-select formControlName="classNumber">
+            <mat-option *ngFor="let classOption of classOptions || []" [value]="classOption">
+              {{ classOption }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+    </form>
+
+    <div>
+      <label for="photo">Photo:</label>
+      <input type="file" id="photo" formControlName="photo">
+    </div>
+
+    <button mat-raised-button color="primary" type="submit">Save</button>
+  </form>
+  
+</div>

@@ -1,1 +1,24 @@
-<router-outlet>
+<div class="container"><mat-toolbar color="primary">
+    <span>School Management System</span>
+    <span class="spacer"></span>
+  
+    <!-- Show these options if the user is not logged in -->
+    <ng-container *ngIf="!isLoggedIn">
+      <button mat-button routerLink="/register">Register</button>
+      <button mat-button routerLink="/login">Login</button>
+    </ng-container>
+  
+    <!-- Show these options if the user is logged in -->
+    <ng-container *ngIf="isLoggedIn">
+      <!-- Add any other options you want to display for a logged-in user -->
+      <div>
+        <div class="add">
+            <button mat-button (click)="openStudentFormDialog()">Add Student</button>
+        </div>
+    </div>
+      <button mat-button (click)="logout()">Logout</button>
+    </ng-container>
+</mat-toolbar>
+</div>
+  <router-outlet></router-outlet>
+  

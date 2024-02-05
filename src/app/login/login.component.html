@@ -1,1 +1,22 @@
-<p>login works!</p>
+<div class="center-container">
+    <div class="centered-content">
+        <h2>Login</h2>
+    <mat-form-field appearance="fill">
+      <mat-label>Username:</mat-label>
+      <input matInput [(ngModel)]="username" type="text" required>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="fill">
+      <mat-label>Password:</mat-label>
+      <input matInput [(ngModel)]="password" type="password" required>
+    </mat-form-field>
+    <br>
+    <div>
+        <button class="button-container" mat-raised-button color="primary" (click)="login()">Login</button>
+    </div>
+    <div class="button-container">
+        <button mat-raised-button color="primary" (click)="navigateToRegister()">Register</button>
+    </div>
+    </div>
+  </div>
+  
