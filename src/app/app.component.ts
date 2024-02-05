@@ -22,11 +22,17 @@ export class AppComponent {
     this.studentListService.students$.subscribe((students) => {
       this.students = students;
     });
+    this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   }
   updateLoginStatus(isLoggedIn: boolean): void {
     this.isLoggedIn = isLoggedIn;
+    if (isLoggedIn) {
+      localStorage.setItem('isLoggedIn', 'true');
+    } else {
+      localStorage.removeItem('isLoggedIn');
+    }
   }
-
+  
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);

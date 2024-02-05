@@ -10,4 +10,7 @@ export class TokenService {
     removeToken(): void {
       localStorage.removeItem('token');
     }
+    isLoggedIn(): boolean {
+      return localStorage.getItem('isLoggedIn') === 'true';
+    }    
   }
