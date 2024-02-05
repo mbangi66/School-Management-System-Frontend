@@ -20,7 +20,7 @@
       <input matInput type="text" id="subject" formControlName="subject" required>
     </mat-form-field>
 
-    <form [formGroup]="filterForm">
+    <div formGroupName="filterForm">
       <mat-form-field appearance="fill">
           <mat-label>Type:</mat-label>
           <mat-select formControlName="type">
@@ -45,7 +45,7 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-    </form>
+      </div>
 
     <div>
       <label for="photo">Photo:</label>

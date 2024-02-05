@@ -14,7 +14,6 @@ import { FilterService } from '../filter.service';
 export class EditStudentFormComponent implements OnInit {
   @Input() student: Student | undefined;
   studentForm!: FormGroup;
-  filterForm!: FormGroup;
   yearOptions: number[] = [];
   classOptions: string[] = [];
   selectedStudent: Student | undefined;
@@ -35,10 +34,9 @@ export class EditStudentFormComponent implements OnInit {
       
     }
     this.initFilterForm();
-    this.initForm();
   }
 
-  initForm(): void {
+  initFilterForm(): void {
     this.studentForm = this.fb.group({
       name: [this.student?.name || '', Validators.required],
       grade: [this.student?.grade || '', Validators.required],
@@ -47,54 +45,50 @@ export class EditStudentFormComponent implements OnInit {
       year: [this.student?.year || null, Validators.required],
       classNumber: [this.student?.classNumber || null, Validators.required],
       type: [this.student?.type || '', Validators.required],
-      photo: [this.student?.photo || ''],
+      photo: [this.student?.photo || null],
+      filterForm: this.fb.group({
+        type: ['Primary'],
+        year: [null],
+        classNumber: [null],
+      }),
     });
-  }
-
-  initFilterForm(): void {
-    this.filterForm = this.fb.group({
-      type: ['Primary'],
-      year: [null],
-      classNumber: [null],
-    });
-    this.filterForm.get('type')?.valueChanges.subscribe((type) => {
+  
+    this.studentForm.get('filterForm')?.get('type')?.valueChanges.subscribe((type) => {
       this.updateYearAndClassOptions(type);
     });
-    this.filterForm.get('type')?.setValue('Primary');
-
-    // Initialize options for the default type
+  
+    this.studentForm.get('filterForm')?.get('type')?.setValue('Primary');
+  
     this.updateYearAndClassOptions('Primary');
   }
 
   updateYearAndClassOptions(type: string): void {
+    // Access 'filterForm' through 'studentForm'
+    let filterForm = this.studentForm.get('filterForm');
+  
     this.yearOptions = this.filterService.getYears(type);
-    this.classOptions = this.filterService.getClasses(type, this.filterForm.get('year')?.value); // Pass null as the year initially
+    this.classOptions = this.filterService.getClasses(type, filterForm?.get('year')?.value); // Pass null as the year initially
   
     // Reset selected year and class when type changes
-    this.filterForm.get('year')?.setValue(null);
-    this.filterForm.get('classNumber')?.setValue(null);
-  }
-  
-  
-
-  getYearOptions(): number[] {
-    const yearOptions = this.filterForm.get('year')?.value;
-    return Array.isArray(yearOptions) ? yearOptions : [];
-  }
-
-  getClassOptions(): string[] {
-    const classOptions = this.filterForm.get('class')?.value;
-    return Array.isArray(classOptions) ? classOptions : [];
+    filterForm?.get('year')?.setValue(null);
+    filterForm?.get('classNumber')?.setValue(null);
   }
 
   onSubmit(): void {
-    if (this.studentForm.valid) {
-      const formData = this.studentForm.value;
-
+     // Extract filterForm values
+     const filterFormValues = this.studentForm.get('filterForm')?.value;
+  
+     // Prepare the student data
+     const studentData = {
+       ...this.studentForm.value,
+       type: filterFormValues?.type,
+       year: filterFormValues?.year,
+       classNumber: filterFormValues?.classNumber,
+     };
       if (this.student) {
         // Editing existing student
-        formData.id = this.student.id;
-        this.studentService.updateStudent(formData).subscribe(
+        studentData.id = this.student.id;
+        this.studentService.updateStudent(studentData).subscribe(
           (response) => {
             console.log('Student updated successfully:', response);
             this.snackBar.open('Student updated successfully!', 'Close', {
@@ -109,8 +103,7 @@ export class EditStudentFormComponent implements OnInit {
         );
       }
     }
-  }
-
+    
   onCancel(): void {
     this.dialogRef.close();
   }

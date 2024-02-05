@@ -20,7 +20,7 @@
         <input matInput type="text" id="subject" formControlName="subject" required>
       </mat-form-field>
   
-      <form [formGroup]="filterForm">
+      <div formGroupName="filterForm">
         <mat-form-field appearance="fill">
             <mat-label>Type:</mat-label>
             <mat-select formControlName="type">
@@ -39,13 +39,13 @@
         
         <mat-form-field appearance="fill">
             <mat-label>Class:</mat-label>
-            <mat-select formControlName="class">
+            <mat-select formControlName="classNumber">
               <mat-option *ngFor="let classOption of classOptions || []" [value]="classOption">
                 {{ classOption }}
               </mat-option>
             </mat-select>
           </mat-form-field>
-      </form>
+        </div>
   
       <div>
         <label for="photo">Photo:</label>

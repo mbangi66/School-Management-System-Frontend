@@ -14,7 +14,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class StudentFormComponent implements OnInit {
   @Input() student: Student | undefined;
   studentForm!: FormGroup;
-  filterForm!: FormGroup;
   yearOptions: number[] = [];
   classOptions: string[] = [];
   selectedStudent: Student | undefined;
@@ -25,7 +24,7 @@ export class StudentFormComponent implements OnInit {
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<StudentFormComponent>,
-    @Inject(MAT_DIALOG_DATA ) public data: any
+    @Inject(MAT_DIALOG_DATA ) public data: any,
   ) {}
 
   ngOnInit(): void {
@@ -34,28 +33,10 @@ export class StudentFormComponent implements OnInit {
       this.student = { ...this.data.student };
     }
   
-    // Subscribe to filter changes (if needed)
-    this.filterService.typeFilter$.subscribe((type) => {
-      console.log('Type Filter Changed:', type);
-      // Add logic to handle filter changes if necessary
-    });
-  
-    this.filterService.yearFilter$.subscribe((year) => {
-      console.log('Year Filter Changed:', year);
-      // Add logic to handle filter changes if necessary
-    });
-  
-    this.filterService.classFilter$.subscribe((classNumber) => {
-      console.log('Class Filter Changed:', classNumber);
-      // Add logic to handle filter changes if necessary
-    });
-  
     this.initFilterForm();
-    this.initForm();
   }
-  
 
-  initForm(): void {
+  initFilterForm(): void {
     this.studentForm = this.fb.group({
       name: [this.student?.name || '', Validators.required],
       grade: [this.student?.grade || '', Validators.required],
@@ -64,65 +45,62 @@ export class StudentFormComponent implements OnInit {
       year: [this.student?.year || null, Validators.required],
       classNumber: [this.student?.classNumber || null, Validators.required],
       type: [this.student?.type || '', Validators.required],
-      photo: [this.student?.photo || ''],
+      photo: [this.student?.photo || null],
+      filterForm: this.fb.group({
+        type: ['Primary'],
+        year: [null],
+        classNumber: [null],
+      }),
     });
-  }
-
-  initFilterForm(): void {
-    this.filterForm = this.fb.group({
-      type: ['Primary'],
-      year: [null],
-      classNumber: [null],
-    });
-
-    this.filterForm.get('type')?.valueChanges.subscribe((type) => {
+  
+    this.studentForm.get('filterForm')?.get('type')?.valueChanges.subscribe((type) => {
       this.updateYearAndClassOptions(type);
     });
-
-    // Initialize options for the default type
+  
+    this.studentForm.get('filterForm')?.get('type')?.setValue('Primary');
+  
     this.updateYearAndClassOptions('Primary');
   }
+  
 
   updateYearAndClassOptions(type: string): void {
+    // Access 'filterForm' through 'studentForm'
+    let filterForm = this.studentForm.get('filterForm');
+  
     this.yearOptions = this.filterService.getYears(type);
-    this.classOptions = this.filterService.getClasses(type, this.filterForm.get('year')?.value);
+    this.classOptions = this.filterService.getClasses(type, filterForm?.get('year')?.value); // Pass null as the year initially
   
     // Reset selected year and class when type changes
-    this.filterForm.get('year')?.setValue(null);
-    this.filterForm.get('classNumber')?.setValue(null); // Corrected from 'class' to 'classNumber'
+    filterForm?.get('year')?.setValue(null);
+    filterForm?.get('classNumber')?.setValue(null);
   }
   
-
-  getYearOptions(): number[] {
-    const yearOptions = this.filterForm.get('year')?.value;
-    return Array.isArray(yearOptions) ? yearOptions : [];
-  }
-
-  getClassOptions(): string[] {
-    const classOptions = this.filterForm.get('class')?.value;
-    return Array.isArray(classOptions) ? classOptions : [];
-  }
 
   onSubmit(): void {
     if (this.studentForm.valid) {
-      const formData = this.studentForm.value;
+      // Extract filterForm values
+      const filterFormValues = this.studentForm.get('filterForm')?.value;
   
-      // Call the service method to add the student to the database
-      this.studentService.addStudent(formData).subscribe(
+      // Prepare the student data
+      const studentData = {
+        ...this.studentForm.value,
+        type: filterFormValues?.type,
+        year: filterFormValues?.year,
+        classNumber: filterFormValues?.classNumber,
+      };
+  console.log(studentData)
+      // Add a new student
+      this.studentService.addStudent(studentData).subscribe(
         (response) => {
           console.log('Student added successfully:', response);
-          // You can handle success as needed (e.g., show a success message)
           this.snackBar.open('Student added successfully!', 'Close', {
             duration: 3000,
             panelClass: ['success-snackbar'],
           });
-          // Close the dialog
           this.dialogRef.close();
-          this.selectedStudent = undefined;
         },
         (error) => {
-          console.error('Error adding student:', error);
-          // You can handle the error (e.g., show an error message)
+          console.error('Failed to add student', error);
           this.snackBar.open('Error adding student', 'Close', {
             duration: 3000,
             panelClass: ['error-snackbar'],
@@ -130,11 +108,10 @@ export class StudentFormComponent implements OnInit {
         }
       );
     }
-  } 
-  
+  }  
 
   onCancel(): void {
     this.dialogRef.close();
-    this.selectedStudent = undefined;
+
   }
 }
