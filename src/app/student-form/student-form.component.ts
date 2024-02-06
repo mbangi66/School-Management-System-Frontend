@@ -42,9 +42,6 @@ export class StudentFormComponent implements OnInit {
       grade: [this.student?.grade || '', Validators.required],
       age: [this.student?.age || '', [Validators.required, Validators.min(0)]],
       subject: [this.student?.subject || '', Validators.required],
-      year: [this.student?.year || null, Validators.required],
-      classNumber: [this.student?.classNumber || null, Validators.required],
-      type: [this.student?.type || '', Validators.required],
       photo: [this.student?.photo || null],
       filterForm: this.fb.group({
         type: ['Primary'],
@@ -88,7 +85,6 @@ export class StudentFormComponent implements OnInit {
         year: filterFormValues?.year,
         classNumber: filterFormValues?.classNumber,
       };
-  console.log(studentData)
       // Add a new student
       this.studentService.addStudent(studentData).subscribe(
         (response) => {
@@ -107,6 +103,8 @@ export class StudentFormComponent implements OnInit {
           });
         }
       );
+    } else {
+      console.log('Form is not valid', this.studentForm);
     }
   }  
 
